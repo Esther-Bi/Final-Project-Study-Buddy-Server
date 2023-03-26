@@ -17,3 +17,16 @@ const firebaseConfig = {
 
 const fireBaseRef = initializeApp(firebaseConfig);
 const db = fb.getFirestore(fireBaseRef);
+
+export async function getStudentDetails(uid) {
+    console.log(uid)
+    const studentsRef = fb.doc(db, 'students', uid)
+    const userDoc = await fb.getDoc(studentsRef)
+    if(userDoc.exists()){
+        const {name, age, year, degree, phone} = userDoc.data()
+        return {name, age, year, degree, phone}
+    } else{
+      console.log("error")
+    }
+    return null
+  }
