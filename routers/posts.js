@@ -26,3 +26,21 @@ postRouter.post('/updateStudentDetails', async (req, res) => {
     return res.status(200).send("done")
     
   })
+
+postRouter.post('/updateTeacherDetails', async (req, res) => {
+  const userList = await post_functions.updateTeacherDetails(req.body.uid, req.body.name, req.body.year, req.body.degree, req.body.gender, req.body.age, req.body.phone, req.body.payBox)
+  if (userList.length === 0 ) {
+    return res.status(404).send()
+  }
+  return res.status(200).send("done")
+  
+})
+
+//update teacher details (first time)
+postRouter.post('/newTeacher', async (req, res) => {
+  const ans = await post_functions.newTeacher(req.body.uid, req.body.name, req.body.year, req.body.degree, req.body.gender, req.body.age, req.body.phone, req.body.payBox)
+  if (ans.length === 0 ) {
+    return res.status(404).send()
+  }
+  return res.status(200).send("done")
+})

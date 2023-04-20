@@ -35,3 +35,43 @@ export async function updateStudentDetails(uid, name, year, degree, gender, age,
         console.log("error")
     }
 }
+
+export async function updateTeacherDetails(uid, name, year, degree, gender, age, phone, payBox) {
+    const teachersRef = fb.doc(db, 'teachers', uid)
+    const userDoc = await fb.getDoc(teachersRef)
+    if(userDoc.exists()){
+        await fb.updateDoc(teachersRef, {name: name})
+        await fb.updateDoc(teachersRef, {year: year})
+        await fb.updateDoc(teachersRef, {degree: degree})
+        await fb.updateDoc(teachersRef, {gender: gender})
+        await fb.updateDoc(teachersRef, {age: age})
+        await fb.updateDoc(teachersRef, {phone: phone})
+        await fb.updateDoc(teachersRef, {payBox: payBox})
+        return "done"
+    }
+    else{
+        console.log("error")
+    }
+}
+
+//add new user to the database
+export async function newTeacher(uid, name, year, degree, gender, age, phone, payBox) {
+    var courses = []
+    var grades = []
+    var prices = []
+    await fb.setDoc(fb.doc(db, "teachers", uid), 
+    {
+        year: year,
+        degree: degree,
+        gender: gender,
+        age: age,
+        name: name,
+        payBox: payBox,
+        phone: phone,
+        uid: uid,
+        courses: courses,
+        grades: grades,
+        prices: prices
+    });
+    return "done"
+}

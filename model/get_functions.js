@@ -30,3 +30,16 @@ export async function getStudentDetails(uid) {
     }
     return null
   }
+
+  export async function getTeacherDetails(uid) {
+    console.log(uid)
+    const teachersRef = fb.doc(db, 'teachers', uid)
+    const userDoc = await fb.getDoc(teachersRef)
+    if(userDoc.exists()){
+        const {name, age, year, degree} = userDoc.data()
+        return {name, age, year, degree}
+    } else{
+      console.log("error")
+    }
+    return null
+  }
