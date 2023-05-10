@@ -69,7 +69,7 @@ export async function newTeacher(uid, name, year, degree, gender, age, phone, pa
         name: name,
         payBox: payBox,
         phone: phone,
-        uid: uid,
+        id: uid,
         courses: courses,
         grades: grades,
         prices: prices,
