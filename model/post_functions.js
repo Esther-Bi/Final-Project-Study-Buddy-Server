@@ -74,7 +74,7 @@ export async function newTeacher(uid, name, year, degree, gender, age, phone, pa
         grades: grades,
         prices: prices,
         dates: dates,
-        rate: null
+        rating: null
     });
     return "done"
 }
@@ -155,15 +155,15 @@ export async function updateRate(uid, teacherName, date, subject, rating) {
     const teachersRef = fb.doc(db, 'teachers', teacherID)
     const userDoc = await fb.getDoc(teachersRef)
     if(userDoc.exists()){
-        const corrRate = userDoc.data().rate
+        const corrRate = userDoc.data().rating
         //update teacher rate
         if (corrRate == null){
-            await fb.updateDoc(teachersRef, {rate: rating})
+            await fb.updateDoc(teachersRef, {rating: rating})
             return "done"
         }
         else{
             const newRate = (parseFloat(corrRate)*3 + parseFloat(rating))/4
-            await fb.updateDoc(teachersRef, {rate: newRate})
+            await fb.updateDoc(teachersRef, {rating: newRate})
             return "done"
         }
     } else{
@@ -342,5 +342,139 @@ export async function deleteClassStudent(uid, name, subject, date) {
     }
 }
 
+//delete member from group
+export async function deleteFromGroup(uid, groupId) {
+    
+    const groupsRef = fb.doc(db, 'groups', groupId)
+    const userDoc = await fb.getDoc(groupsRef)
+    if(userDoc.exists()){
+        var participant = []
+        for(var i=0; i<userDoc.data().participants.length; i++){
+            if(userDoc.data().participants[i] != uid){
+                participant.push(userDoc.data().participants[i])
+            }
+        }
+        if (participant.length === 0){
+            await fb.deleteDoc(fb.doc(db, "groups", groupId))
+            return "done and delete group"
+        }
+        await fb.updateDoc(groupsRef, {participants: participant})
+        return "done"
+    }
+    else{
+        console.log("error")
+    }
+}
 
-//update the past classes to past == yes
+export async function editGroupTime(groupId, day, time, location) {
+    
+    console.log(day)
+    console.log(time)
+    console.log(location)
+
+    const groupsRef = fb.doc(db, 'groups', groupId)
+    const userDoc = await fb.getDoc(groupsRef)
+    if(userDoc.exists()){
+        if (location !== "Select Location"){
+            await fb.updateDoc(groupsRef, {location: location})}
+        if (day !== "Select Day"){
+            await fb.updateDoc(groupsRef, {day: day})}
+        if (time !== "Select Time"){
+            await fb.updateDoc(groupsRef, {time: time})}
+        return "done"
+    }
+    else{
+        console.log("error")
+    }
+}
+
+// Update if corses is past
+export async function PastCourses(){
+
+    const classesSnapshot = await fb.getDocs(fb.collection(db, "classes"))
+    
+    classesSnapshot.forEach(async (doc) => {
+      // Check if the document exists
+      if (doc.exists) {
+        // Compare the dates        
+        var classDate = doc.data().date;
+
+        const dateParts = classDate.split(' ');
+        const month = dateParts[0];
+        const day = dateParts[1];
+        const year = dateParts[2];
+        const time = dateParts[4];
+        const dateTimeString = `${month} ${day}, ${year} ${time}`;
+        const d2 = new Date(dateTimeString);
+
+        const today = new Date();
+        const d1 = new Date(today);
+
+        if (d1 > d2) {
+            await fb.updateDoc(doc.ref, { past: 'yes' });
+          }
+      }
+    });
+
+    return "done";
+
+}
+
+//delete class through student
+export async function deletePaidClass(uid, studentName, subject, date) {
+    
+    const q = fb.query(fb.collection(db, 'classes'), fb.where("teacher", "==", uid), fb.where("studentName", "==", studentName), fb.where("subject", "==", subject), fb.where("date", "==", date));
+    const snapshot = await fb.getDocs(q);
+    const classListFromDB = snapshot.docs || []
+    const classList = classListFromDB.map(doc=> {
+        const cid = doc.id
+        return {cid}
+    })
+    await fb.deleteDoc(fb.doc(db, "classes", classList[0].cid))
+    return "done"
+}
+
+// open new group
+export async function openNewGroup(uid, subject, degree, year, day, time, language, min, max, location, link){
+    var participants = []
+    participants.push(uid)
+
+    const docRef = await fb.addDoc(fb.collection(db, "groups"), 
+    {
+        participants: participants,
+        subject: subject,
+        degree: degree,
+        year: year,
+        day: day,
+        time: time,
+        language: language,
+        min_participants: parseInt(min),
+        max_participants: parseInt(max),
+        location: location,
+        link: link,
+        available: true,
+        id: null
+    });
+    await fb.updateDoc(fb.doc(db, 'groups', docRef.id), {id: docRef.id})
+
+    return "done"
+}
+
+// join a group
+export async function joinGroup(uid, id){
+    const groupsRef = fb.doc(db, 'groups', id)
+    const userDoc = await fb.getDoc(groupsRef)
+    if(userDoc.exists()){
+        var participants = []
+        for(var i=0; i<userDoc.data().participants.length; i++){
+            participants.push(userDoc.data().participants[i])
+        }
+        participants.push(uid)
+        await fb.updateDoc(groupsRef, {participants: participants})
+        return "done"
+    }
+    else{
+        console.log("error")
+    }
+    return "done"
+}

@@ -131,3 +131,63 @@ postRouter.post('/deleteClassStudent', async (req, res) => {
   return res.status(200).send("done")
   
 })
+
+//delete member from group
+postRouter.post('/deleteFromGroup', async (req, res) => {
+  const userList = await post_functions.deleteFromGroup(req.body.uid, req.body.groupId)
+  if (userList.length === 0 ) {
+    return res.status(404).send()
+  }
+  return res.status(200).send("done")
+  
+})
+
+//edit group time
+postRouter.post('/editGroupTime', async (req, res) => {
+  const userList = await post_functions.editGroupTime(req.body.groupId, req.body.day, req.body.time, req.body.location)
+  if (userList.length === 0 ) {
+    return res.status(404).send()
+  }
+  return res.status(200).send("done")
+  
+})
+
+//update if corses is past
+postRouter.post('/PastCourses', async (req, res) => {
+  const userList = await post_functions.PastCourses()
+  if (userList.length === 0 ) {
+    return res.status(404).send()
+  }
+  return res.status(200).send("done")
+  
+})
+
+//delete class through student
+postRouter.post('/deletePaidClass', async (req, res) => {
+  const userList = await post_functions.deletePaidClass(req.body.uid, req.body.studentName, req.body.subject, req.body.date)
+  if (userList.length === 0 ) {
+    return res.status(404).send()
+  }
+  return res.status(200).send("done")
+  
+})
+
+// open new group
+postRouter.post('/openNewGroup', async (req, res) => {
+  const userList = await post_functions.openNewGroup(req.body.uid, req.body.subject, req.body.degree, req.body.year, req.body.day, req.body.time, req.body.language, req.body.min, req.body.max, req.body.location, req.body.link)
+  if (userList.length === 0 ) {
+    return res.status(404).send()
+  }
+  return res.status(200).send("done")
+  
+})
+
+// join a group
+postRouter.post('/joinGroup', async (req, res) => {
+  const userList = await post_functions.joinGroup(req.body.uid, req.body.id)
+  if (userList.length === 0 ) {
+    return res.status(404).send()
+  }
+  return res.status(200).send("done")
+  
+})
