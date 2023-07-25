@@ -45,10 +45,11 @@ export async function getTeacherDetails(uid) {
   return null
 }
 
-export async function getFilteredTeachers(course, date, from, to) {
+export async function getFilteredTeachers(course, date, from, to, sortId) {
   
   //An array that will contain all the teachers match the filter
   const filteredTeachers = []
+  const num_cours = -1;
   //creat list contain all teachers from fierbais
   const teacherSnapshot = await fb.getDocs(fb.collection(db, 'teachers'))
   const teacherListFromDB = teacherSnapshot.docs || []
@@ -116,6 +117,70 @@ export async function getFilteredTeachers(course, date, from, to) {
       filteredTeachers.push(teacher)
     }
   });
+
+  if (sortId == "grade"){
+    filteredTeachers.sort((a, b) => {
+      var intA = -1
+      var intB = -1
+      var x =-1
+      const courseListA = a.courses
+      courseListA.forEach((c) => {
+        //if this is the course in the filter or did not enter a course
+        x++
+        if (c == course){
+          intA = x
+        }
+      });
+      x =-1
+      const courseListB = b.courses
+      courseListB.forEach((c) => {
+        //if this is the course in the filter or did not enter a course
+        x++
+        if (c == course){
+          intB = x
+        }
+      });
+      if (a.grades[intA] > b.grades[intB]) {
+        return -1;
+      }
+      if (a.grades[intA] < b.grades[intB]) {
+        return 1;
+      }    
+      return 0;
+    });
+  }
+  if (sortId == "price"){
+    filteredTeachers.sort((a, b) => {
+      var intA = -1
+      var intB = -1
+      var x =-1
+      const courseLista = a.courses
+      courseLista.forEach((c) => {
+        //if this is the course in the filter or did not enter a course
+        x++
+        if (c == course){
+          intA = x
+        }
+      });
+      x =-1
+      const courseListb = b.courses
+      courseListb.forEach((c) => {
+        //if this is the course in the filter or did not enter a course
+        x++
+        if (c == course){
+          intB = x
+        }
+      });
+      if (a.prices[intA] < b.prices[intB]) {
+        return -1;
+      }
+      if (a.prices[intA] > b.prices[intB]) {
+        return 1;
+      }    
+      return 0;
+    });
+  }
+
   return filteredTeachers;  
 }
 

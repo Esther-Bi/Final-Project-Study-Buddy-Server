@@ -20,7 +20,7 @@ getRouter.get('/getTeacherDetails', async(req, res) =>{
 })
 
 getRouter.get('/getFilteredTeachers', async(req, res) =>{
-  const user = await get_functions.getFilteredTeachers(req.query.course, req.query.date, req.query.from, req.query.to)
+  const user = await get_functions.getFilteredTeachers(req.query.course, req.query.date, req.query.from, req.query.to, req.query.sortId)
   if (user.length === 0){
     return res.status(404).send()
   }
